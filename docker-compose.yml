@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - "15673:15672"
+
+  productapi:
+    container_name: productapi
+    image: product-api-java
+    build:
+      context: .
+      dockerfile: Product-api/Dockerfile
+    ports:
+        - 9021:8081
+    depends_on:
+      - rabbitmq
+
+  orderapi:
+    container_name: orderapi
+    image: order-api-java
+    build:
+      context: .
+      dockerfile: Order-api/Dockerfile
+    ports:
+      - 9020:8080
+    depends_on:
+      - rabbitmq
+
+  gateway:
+    container_name: gateway
+    image: api-gateway-java
+    build:
+      context: .
+      dockerfile: Api-Gateway/Dockerfile
+    ports:
+      - 9022:8082
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:latest
+    ports:
+      - 9411:9411
